@@ -3,69 +3,75 @@ using System.Collections.Generic;
 using UnityEngine;
 using Leap.Unity;
 using Vectrosity;
+using UnityEngine.VR;
 
 public class DemoManager : MonoBehaviour {
 
     public GameObject CenterEyeAnchor;
 
-    VectorLine line;
+    public GameObject ButtonPrefab;
 
-    List<Vector3> points;
+    public GameObject CenterCircleObject;
 
-    Camera cam;
+    public int NumberOfCircles;
 
-    GameObject cube;
+    public float CircleRadius;
 
-    public GameObject button;
+    VectorLine LineDebug;
 
-    GameObject buttonRef;
+    List<Vector3> LinePoints;
+
+    Camera CameraRef;
+
+    List<GameObject> ButtonsList;
 
     void Start () {
 
-        LeapVRCameraControl.OnValidCameraParams += OnValidCameraParams;
         VectorManager.useDraw3D = true;
-        points = new List<Vector3>();
-        points.Add(Vector3.zero);
-        points.Add(Vector3.zero);
-        line = new VectorLine("line", points, 4.0f);
-        line.smoothWidth = true;
-        cam = CenterEyeAnchor.GetComponent<Camera>();
-        VectorLine.SetCamera3D(cam);
-        //line.drawTransform = cam.transform;
-        line.drawTransform = CenterEyeAnchor.transform;
+        LinePoints = new List<Vector3>();
+        LinePoints.Add(Vector3.zero);
+        LinePoints.Add(Vector3.zero);
+        LineDebug = new VectorLine("line", LinePoints, 4.0f);
+        LineDebug.smoothWidth = true;
 
-        cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        //buttonRef = Instantiate(button, Vector3.zero, Quaternion.identity);
+        if(CenterEyeAnchor)
+        {
+            CameraRef = CenterEyeAnchor.GetComponent<Camera>();
+            VectorLine.SetCamera3D(CameraRef);
+            LineDebug.drawTransform = CenterEyeAnchor.transform;
+            //LineDebug.drawTransform = cam.transform;
+        }
+
+        if(CenterCircleObject && ButtonPrefab && NumberOfCircles > 0)
+        {
+            float CurrentAngle = 0.0f;
+            float AngleDelta = 2.0f * Mathf.PI / NumberOfCircles;
+            ButtonsList = new List<GameObject>();
+
+            for (int i = 0; i < NumberOfCircles; ++i)
+            {
+                float x = CenterCircleObject.transform.position.x + CircleRadius * Mathf.Cos(CurrentAngle);
+                float y = CenterCircleObject.transform.position.y + CircleRadius * Mathf.Sin(CurrentAngle);
+                float z = CenterCircleObject.transform.position.z;
+                GameObject NewCircleObj = GameObject.Instantiate(ButtonPrefab, new Vector3(x, y, z), Quaternion.identity);
+                ButtonsList.Add(NewCircleObj);
+                CurrentAngle += AngleDelta;
+            }
+        }
+        
+
+        LeapVRCameraControl.OnValidCameraParams += OnValidCameraParams;
+        InputTracking.Recenter();
     }
 
     private void OnValidCameraParams(LeapVRCameraControl.CameraParams cameraParams)
     {
-        //line.drawTransform = cameraParams.CenterEyeTransform;
+        //LineDebug.drawTransform = cameraParams.CenterEyeTransform;
     }
-    
+
     void Update()
     {
-        if (Input.GetButtonDown("Jump"))
-        {
-            //Debug.Log("space");
-            Vector3 pos = CenterEyeAnchor.transform.position + CenterEyeAnchor.transform.forward.normalized * 5.0f;
-            //Vector3 rotation = new Vector3(0f, CenterEyeAnchor.transform.localEulerAngles.y, 0f);
-            Vector3 rotation = CenterEyeAnchor.transform.localEulerAngles;
-            cube.transform.SetPositionAndRotation(pos, Quaternion.Euler(rotation));
-            //buttonRef.transform.SetPositionAndRotation(pos, Quaternion.Euler(rotation));
-        }
-            
 
-        if (CenterEyeAnchor)
-        {
-            
-            line.points3[0] = CenterEyeAnchor.transform.position + CenterEyeAnchor.transform.forward.normalized * 0.5f;
-            line.points3[1] = CenterEyeAnchor.transform.position + CenterEyeAnchor.transform.forward.normalized * 100.0f;
-            line.Draw3D();
-
-
-            //Debug.DrawRay(CenterEyeAnchor.transform.position, CenterEyeAnchor.transform.forward * 5000.0f);
-        }
     }
 
     private void OnDrawGizmos()

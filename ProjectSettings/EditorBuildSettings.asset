@@ -6,5 +6,5 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Button Builder/Scenes/Button Builder.unity
-    guid: 00000000000000000000000000000000
+    path: Assets/MouseVRDemo/TestScene2.unity
+    guid: f438733710d32404491416e2ec7f55de
