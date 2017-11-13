@@ -53,6 +53,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4193745014921184}
   - component: {fileID: 54213977994728998}
+  - component: {fileID: 114467768896665198}
   - component: {fileID: 114791404299830020}
   - component: {fileID: 114049107206250570}
   m_Layer: 0
@@ -187,6 +188,17 @@ MonoBehaviour:
   hoverColor: {r: 0.101960786, g: 0.101960786, b: 0.101960786, a: 1}
   primaryHoverColor: {r: 0.101960786, g: 0.101960786, b: 0.101960786, a: 1}
   pressedColor: {r: 0, g: 1, b: 0.33793116, a: 1}
+--- !u!114 &114467768896665198
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1683974393092720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3eda6585361a90f459613b022edc67e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114791404299830020
 MonoBehaviour:
   m_ObjectHideFlags: 1
