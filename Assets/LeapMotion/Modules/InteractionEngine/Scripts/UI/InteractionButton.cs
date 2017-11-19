@@ -195,7 +195,7 @@ namespace Leap.Unity.Interaction {
 
           primaryHoveringController.primaryHoverLocked = true;
           _lockedInteractingController = primaryHoveringController;
-          this.enabled = false;
+          //this.enabled = false;
 
         } else if (!isDepressed && oldDepressed) {
           unDepressedThisFrame = true;
