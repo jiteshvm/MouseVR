@@ -223,9 +223,9 @@ MonoBehaviour:
   graspHoldWarpingEnabled__curIgnored: 1
   _eventTable:
     _entries: []
-  minMaxHeight: {x: 0, y: 0.03}
-  restingHeight: 0.5
-  _springForce: 0.1
+  minMaxHeight: {x: 0, y: 0.05}
+  restingHeight: 0.1
+  _springForce: 0.5
   OnPress:
     m_PersistentCalls:
       m_Calls: []

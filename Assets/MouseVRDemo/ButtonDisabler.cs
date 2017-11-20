@@ -11,7 +11,7 @@ public class ButtonDisabler : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        gameObject.GetComponent<InteractionButton>().OnPress.AddListener(OnButtonPress);
+        GetComponent<InteractionButton>().OnPress.AddListener(OnButtonPress);
         GameObject DemoManagerObj = GameObject.Find("DemoManager");
         DemoManagerRef = DemoManagerObj.GetComponent<DemoManager>();
         //Debug.Log(transform.parent.position.x + " , " + transform.parent.position.y + " , " + transform.parent.position.z);
@@ -31,22 +31,20 @@ public class ButtonDisabler : MonoBehaviour {
             InteractionHand ih = (InteractionHand)ic;
             if (ih && ih.isTracked && ih.contactingObjects.Count > 0)
             {
-                Vector tmp = ih.leapHand.Fingers[(int)Finger.FingerType.TYPE_INDEX].TipPosition;
-                //Vector3 fingerPos3 = tmp.ToVector3();
-                Vector2 fingerPos = new Vector2(tmp.x, tmp.y);
-                Vector2 objPos = new Vector2(transform.parent.position.x, transform.parent.position.y);
-                float dist = Vector2.Distance(fingerPos, objPos);
-                //float dist = Vector3.Distance(transform.parent.position, fingerPos3);
-                Debug.Log(dist * 1000.0f);
+                Vector TipPosition = ih.leapHand.Fingers[(int)Finger.FingerType.TYPE_INDEX].TipPosition;
+                Vector2 TipPosition2D = new Vector2(TipPosition.x, TipPosition.y);
+                Vector2 objPos2D = new Vector2(transform.parent.position.x, transform.parent.position.y);
+                float dist2D = Vector2.Distance(TipPosition2D, objPos2D);
+                float floatdist2D_mm = dist2D * 1000.0f;
+                DemoManagerRef.LogTimeAndDistance(floatdist2D_mm);
                 //DebugCube.transform.position = ih.leapHand.Fingers[(int)Finger.FingerType.TYPE_INDEX].TipPosition.ToVector3();
             }
         }
 
-        DemoManagerRef.ActivateRandomTarget();
+        
     }
 
 	// Update is called once per frame
 	void Update () {
-		
 	}
 }

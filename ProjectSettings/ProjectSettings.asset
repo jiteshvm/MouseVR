@@ -142,7 +142,7 @@ PlayerSettings:
   resolutionScalingMode: 0
   applicationIdentifier:
     Android: com.leapmotion.oriongearvr
-    Standalone: unity.LeapMotion.OrionCoreAssets
+    Standalone: MouseVRDemo
     Tizen: com.leapmotion.oriongearvr
     iOS: com.leapmotion.oriongearvr
     tvOS: com.leapmotion.oriongearvr

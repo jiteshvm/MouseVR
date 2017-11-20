@@ -1,0 +1,2 @@
+TargetWidth: 72
+InterTargetDistance: 100
