@@ -33,6 +33,8 @@ public class DemoManager : MonoBehaviour {
 
     List<GameObject> TargetsList;
 
+    List<int> TargetsOrder;
+
     List<int> RandomButtonIndices;
 
     List<float> TimeList;
@@ -55,6 +57,8 @@ public class DemoManager : MonoBehaviour {
     float EndTime;
 
     float ElapsedTime;
+
+    int CurrentTarget;
 
     void Start () {
         //LinePoints = new List<Vector3>();
@@ -99,6 +103,7 @@ public class DemoManager : MonoBehaviour {
             RandomButtonIndices = new List<int>();
             TimeList = new List<float>();
             DistanceList = new List<float>();
+            TargetsOrder = new List<int>();
 
             for (int i = 0; i < NumberOfTargets; ++i)
             {
@@ -139,6 +144,8 @@ public class DemoManager : MonoBehaviour {
         RandomButtonIndices.Clear();
         TimeList.Clear();
         DistanceList.Clear();
+        TargetsOrder.Clear();
+
         for (int i = 0; i < TargetsList.Count; ++i)
         {
             TargetsList[i].transform.GetChild(0).gameObject.GetComponent<Rigidbody>().detectCollisions = false;
@@ -195,13 +202,14 @@ public class DemoManager : MonoBehaviour {
             int RandomIndex = UnityEngine.Random.Range(0, RandomButtonIndices.Count);
             //Debug.Log("random index : " + RandomIndex);
             int RandomValue = RandomButtonIndices[RandomIndex];
+            CurrentTarget = RandomValue;
             //Debug.Log(" random value : " + RandomValue);
             GameObject ButtonInteractionRef = TargetsList[RandomValue].transform.GetChild(0).gameObject;
             ButtonInteractionRef.GetComponent<Rigidbody>().detectCollisions = true;
             ButtonInteractionRef.GetComponent<SimpleInteractionGlow>().defaultColor = Color.blue;
             ButtonInteractionRef.GetComponent<SimpleInteractionGlow>().hoverColor = Color.blue;
             ButtonInteractionRef.GetComponent<SimpleInteractionGlow>().primaryHoverColor = Color.blue;
-            RandomButtonIndices.Remove(RandomValue);
+            RandomButtonIndices.RemoveAt(RandomIndex);
             //Debug.Log("Count : " + RandomButtonIndices.Count);
         }
         
@@ -276,6 +284,11 @@ public class DemoManager : MonoBehaviour {
         {
             Restart();
         }
+
+        if(Input.GetKeyDown(KeyCode.D))
+        {
+            LogTimeAndDistance(0.0f);
+        }
     }
 
     public void LogTimeAndDistance(float dist)
@@ -283,6 +296,8 @@ public class DemoManager : MonoBehaviour {
         EndTime = ElapsedTime;
         TimeList.Add(EndTime - StartTime);
         DistanceList.Add(dist);
+        TargetsOrder.Add(CurrentTarget);
+
         ActivateRandomTarget();
         if(TimeList.Count >= NumberOfTargets || DistanceList.Count >= NumberOfTargets)
         {
@@ -291,7 +306,7 @@ public class DemoManager : MonoBehaviour {
             StreamWriter swr = File.CreateText(outputFile);
             for(int i = 0; i < NumberOfTargets; ++i)
             {
-                swr.WriteLine ("{0}.  Time : {1} ,  Accuracy : {2}", (i+1), TimeList[i], DistanceList[i]);
+                swr.WriteLine ("{0}.  Time : {1} ,  Accuracy : {2}", TargetsOrder[i], TimeList[i], DistanceList[i]);
                 //Debug.Log((i+1) + ". " + " Time : " + TimeList[i] + " , Accuracy : " + DistanceList[i]);
             }
             swr.Close();
