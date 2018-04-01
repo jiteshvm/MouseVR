@@ -8,42 +8,94 @@ using Leap.Unity;
 using Leap.Unity.Interaction;
 using UnityEngine.VR;
 
+struct LogData
+{
+    float Time;
+    int Index;
+}
 public class DemoManager2 : MonoBehaviour {
 
-
+    // all the targets are parented to this object so it can be moved around easily
     GameObject BackgroundPanel;
 	float ElapsedTime;
-
-	public GameObject TestPanel;
-
+    public int Rows;
+    public int Columns;
+    public Vector2 PanelSize;
+    public GameObject TestPanel;
 	public HandModel RightHandModel;
-	//Hand RightLeapHand;
 	Vector3 IndexFingerPos;
     //Vector3 IndexBoneDir;
     //Transform IndexBoneTransform;
     Texture2D TextureRef;
-
     public float RaycastDistance = 0.04f;
-
+    public Color32[] Colors;
+    List<GameObject> TargetsList;
+    List<LogData> LogDataList;
+    List<int> RandomIndices;
+    bool IsProgressUpdated = false;
+    Int32 count;
     int layerMask = 1 << 8;
+    
     void Start () {
-
-		// if(RightHandModel) {
-		// 	RightLeapHand = RightHandModel.GetLeapHand();
-		// }
+        TargetsList = new List<GameObject>();
+        RandomIndices = new List<int>();
 
         BackgroundPanel = GameObject.CreatePrimitive(PrimitiveType.Cube);
 		BackgroundPanel.transform.SetPositionAndRotation(transform.position, Quaternion.identity);
-        BackgroundPanel.transform.localScale = new Vector3(2.0f, 2.0f, 0.02f);
+        //BackgroundPanel.transform.localScale = new Vector3(2.0f, 2.0f, 0.02f);
         BackgroundPanel.GetComponent<MeshRenderer>().material.color = Color.magenta;
         BackgroundPanel.GetComponent<MeshRenderer>().enabled = false;
+        BackgroundPanel.name = "BackgroundPanel";
         Destroy(BackgroundPanel.GetComponent<BoxCollider>());
+
+        Vector3 PanelPosition = new Vector3(BackgroundPanel.transform.position.x, BackgroundPanel.transform.position.y, BackgroundPanel.transform.position.z);
+        int colorindx = 0;
+        int panelindx = 0;
+        for(int i = 0; i < Rows; ++i)
+        {
+            for( int j = 0; j < Columns; ++j)
+            {
+                GameObject NewPanel = GameObject.Instantiate(TestPanel, PanelPosition, TestPanel.transform.rotation);
+                NewPanel.name = "Panel_" + (i+1) + "" + (j+1);
+                NewPanel.transform.SetParent(BackgroundPanel.transform);
+                NewPanel.transform.localScale = new Vector3(PanelSize.x, 0.1f, PanelSize.y);
+                ResetTexture ResetScript = NewPanel.GetComponent<ResetTexture>();
+                ResetScript.TextureColor = Colors[colorindx];
+                PanelPosition.y = PanelPosition.y - PanelSize.y * 10.0f;
+
+                TargetsList.Add(NewPanel);
+                
+                RandomIndices.Add(panelindx);
+                panelindx++;
+
+                colorindx++;
+                if(colorindx >= Colors.Length)
+                    colorindx = 0;
+            }
+            PanelPosition.x = PanelPosition.x + PanelSize.x * 10.0f;
+            PanelPosition.y = BackgroundPanel.transform.position.y;
+        }
         InputTracking.Recenter();
+        StartCoroutine(LateStart(1.0f));
     }
 
+    IEnumerator LateStart(float waitTime)
+     {
+         yield return new WaitForSeconds(waitTime);
+         TargetsList[0].GetComponent<ResetTexture>().Enable();
+     }
     void Restart()
     {
-
+        RandomIndices.Clear();
+        for (int i = 0; i < TargetsList.Count; ++i)
+        {
+            //TargetsList[i].transform.GetChild(0).gameObject.GetComponent<Rigidbody>().detectCollisions = false;
+            //TargetsList[i].transform.GetChild(0).gameObject.GetComponent<SimpleInteractionGlow>().defaultColor = Color.black;
+            //TargetsList[i].transform.GetChild(0).gameObject.GetComponent<SimpleInteractionGlow>().hoverColor = Color.black;
+            //TargetsList[i].transform.GetChild(0).gameObject.GetComponent<SimpleInteractionGlow>().primaryHoverColor = Color.black;
+            RandomIndices.Add(i);
+        }
+        ActivateRandomTarget();
     }
 
     private void ReadSettingsFromFile()
@@ -85,7 +137,22 @@ public class DemoManager2 : MonoBehaviour {
 
     public void ActivateRandomTarget()
     {
-
+        if(RandomIndices.Count > 0)
+        {
+            //StartTime = ElapsedTime;
+            int RandomIndex = UnityEngine.Random.Range(0, RandomIndices.Count);
+            //Debug.Log("random index : " + RandomIndex);
+            int RandomValue = RandomIndices[RandomIndex];
+            //CurrentTarget = RandomValue;
+            //Debug.Log(" random value : " + RandomValue);
+            //GameObject ButtonInteractionRef = TargetsList[RandomValue].transform.GetChild(0).gameObject;
+            //ButtonInteractionRef.GetComponent<Rigidbody>().detectCollisions = true;
+            //ButtonInteractionRef.GetComponent<SimpleInteractionGlow>().defaultColor = Color.blue;
+            //ButtonInteractionRef.GetComponent<SimpleInteractionGlow>().hoverColor = Color.blue;
+            //ButtonInteractionRef.GetComponent<SimpleInteractionGlow>().primaryHoverColor = Color.blue;
+            RandomIndices.RemoveAt(RandomIndex);
+            //Debug.Log("Count : " + RandomButtonIndices.Count);
+        }
     }
 
 
@@ -113,7 +180,8 @@ public class DemoManager2 : MonoBehaviour {
                 Vector2 pixelUV = hit.textureCoord;
                 pixelUV.x *= TextureRef.width;
                 pixelUV.y *= TextureRef.height;
-                Circle(TextureRef, (int)pixelUV.x, (int)pixelUV.y, 64, Color.black);
+                //Circle(TextureRef, (int)pixelUV.x, (int)pixelUV.y, 64, Color.black);
+                CircleOld(TextureRef, (int)pixelUV.x, (int)pixelUV.y, 64, Color.black);
             }
 			
 		} 
@@ -122,6 +190,7 @@ public class DemoManager2 : MonoBehaviour {
     void Update()
     {
         ElapsedTime += Time.deltaTime;
+        UpdateProgress();
 		for (int i = 0; i < HandModel.NUM_FINGERS;i++)
 		{
 			FingerModel finger = RightHandModel.fingers[i];
@@ -206,11 +275,62 @@ public class DemoManager2 : MonoBehaviour {
                 if (indx4 >= 0 && indx4 < tempArray.Length)
                     tempArray[indx4] = col;
 
-                //IsProgressUpdated = false;
+                IsProgressUpdated = false;
             }
         }
 
         tex.SetPixels32(tempArray);
         tex.Apply();
+    }
+
+         public void CircleOld(Texture2D tex, int cx, int cy, int r, Color col)
+     {
+         int x, y, px, nx, py, ny, d;
+         
+         for (x = 0; x <= r; x++)
+         {
+             d = (int)Mathf.Ceil(Mathf.Sqrt(r * r - x * x));
+             for (y = 0; y <= d; y++)
+             {
+                 px = cx + x;
+                 nx = cx - x;
+                 py = cy + y;
+                 ny = cy - y;
+
+                 if(tex.GetPixel(px,py) != col)
+                    count++;
+                
+                if(tex.GetPixel(nx,py) != col)
+                    count++;
+                
+                if(tex.GetPixel(px,ny) != col)
+                    count++;
+                
+                if(tex.GetPixel(nx,ny) != col)
+                    count++;
+
+                 tex.SetPixel(px, py, col);
+                 tex.SetPixel(nx, py, col);
+  
+                 tex.SetPixel(px, ny, col);
+                 tex.SetPixel(nx, ny, col);
+
+                IsProgressUpdated = false;
+             }
+         }
+         tex.Apply();    
+     }
+
+    public void UpdateProgress()
+    {
+        if(!IsProgressUpdated)
+        {
+            //Color32[] tempArray = TextureRef.GetPixels32();
+            float t = (count / 262144.0f) * 100.0f;
+            Debug.Log("progress : " + t);
+            //Debug.Log("TextureRef count : " + tempArray.Length);
+            IsProgressUpdated = true;
+            //TextureRef = null;
+        }
     }
 }
