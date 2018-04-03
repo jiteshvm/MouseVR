@@ -1,2 +1,5 @@
-TargetWidth: 36
-InterTargetDistance: 142
+Rows: 3
+Columns: 3
+FingerRadius: 64
+PanelSizeX: 0.02
+PanelSizeY: 0.02
