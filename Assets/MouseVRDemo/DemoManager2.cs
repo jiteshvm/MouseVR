@@ -60,7 +60,11 @@ public class DemoManager2 : MonoBehaviour {
         BackgroundPanel.name = "BackgroundPanel";
         Destroy(BackgroundPanel.GetComponent<BoxCollider>());
 
-        Vector3 PanelPosition = new Vector3(BackgroundPanel.transform.position.x, BackgroundPanel.transform.position.y, BackgroundPanel.transform.position.z);
+        float HalfRows = Rows / 2;
+        float HalfColumns = Columns / 2;
+        float OffsetX = HalfRows * PanelSize.x * 10.0f;
+        float OffsetY = HalfColumns * PanelSize.y * 10.0f;
+        Vector3 PanelPosition = new Vector3(BackgroundPanel.transform.position.x - OffsetX, BackgroundPanel.transform.position.y + OffsetY, BackgroundPanel.transform.position.z);
         int colorindx = 0;
         int panelindx = 0;
         for(int i = 0; i < Columns; ++i)
@@ -84,7 +88,7 @@ public class DemoManager2 : MonoBehaviour {
                     colorindx = 0;
             }
             PanelPosition.y = PanelPosition.y - PanelSize.y * 10.0f;
-            PanelPosition.x = BackgroundPanel.transform.position.x;
+            PanelPosition.x = BackgroundPanel.transform.position.x - OffsetX;
         }
         //Debug.Log("RandomIndices Count : " +  RandomIndices.Count);
         LeapVRCameraControl.OnValidCameraParams += OnValidCameraParams;
